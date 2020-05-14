@@ -7,19 +7,18 @@
 class FileHandler
 {
 public:
-	// Open the file at 'path'. If one does not exist, create one
+	// If the file doesnt exist, it will be created
 	FileHandler(std::string path);
-	// Close the file
 	~FileHandler();
 
 
 	// Load the file's data into 'profiles' array
-	void LoadData(Profile* profiles);
+	void loadData(Profile* profiles);
 	// Replace 'record's data on file with 'newRecord'
-	bool UpdateRecord(Profile* record, Profile* newRecord);
+	bool updateRecord(Profile* record, Profile* newRecord);
 	// Add 'record' to the end of the file
-	void NewRecord(Profile* record);
+	void newRecord(Profile* record);
 
 private:
-	std::fstream file;
+	std::string path;
 };

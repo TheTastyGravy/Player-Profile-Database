@@ -5,32 +5,49 @@ FileHandler::FileHandler(std::string path)
 {
 	// Open the file in read mode first, in case it doesnt exist, as
 	// opening a file in write will prevent a file from being created
-	file.open(path, std::ios::out | std::ios::binary);
+	std::ofstream file;
+	file.open(path, std::ios::binary | std::ios::app);
 	file.close();
-	// Open the file as binary in read/write mode
-	file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+
+	this->path = path;
 }
 
 FileHandler::~FileHandler()
 {
-	// Close the file when the object is deleted
+}
+
+
+
+void FileHandler::loadData(Profile* profiles)
+{
+	// Open the file in read mode
+	std::ifstream file;
+	file.open(path, std::ios::binary);
+
+
+	// Loop dependant on the file, not i
+	for (int i = 0; !file.eof() && file.peek() != EOF; i++)
+	{
+		Profile record;
+
+		file.read((char*)&record, sizeof(Profile));
+
+		// Add the profile to the array
+		profiles[i] = record;
+	}
+
+	// Return to the start of the file
 	file.close();
 }
 
-
-
-void FileHandler::LoadData(Profile* profiles)
+bool FileHandler::updateRecord(Profile* record, Profile* newRecord)
 {
-	// Move to the end of the file and get the position for the size
-	file.seekg(std::ios::end);
-	unsigned int fileSize = file.tellg();
+	// ios::app is used to prevent errasing data
+	std::fstream file;
+	file.open(path, std::ios::binary | std::ios::app);
+	// Reset put pos; ios::app sets it to the end
+	file.seekp(std::ios::beg);
 
-	// The file only consists of records, so read the whole thing
-	file.read((char*)profiles, fileSize);
-}
-
-bool FileHandler::UpdateRecord(Profile* record, Profile* newRecord)
-{
 	// Hold the current record
 	Profile temp;
 
@@ -48,20 +65,27 @@ bool FileHandler::UpdateRecord(Profile* record, Profile* newRecord)
 			// Replace the record
 			file.write((char*)newRecord, sizeof(Profile));
 
+
+			file.close();
 			// Record exists; return true
 			return true;
 		}
 	}
 
+
+	file.close();
 	// Record does not exist; return false
 	return false;
 }
 
-void FileHandler::NewRecord(Profile* record)
+void FileHandler::newRecord(Profile* record)
 {
-	// Write to the end of the file
-	file.seekp(std::ios::end);
-
+	// Open the file in writing mode
+	std::ofstream file;
+	file.open(path, std::ios::binary | std::ios::app);
+	
 	// Write the record into the file
 	file.write((char*)record, sizeof(Profile));
+
+	file.close();
 }

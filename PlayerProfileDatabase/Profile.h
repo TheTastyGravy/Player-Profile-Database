@@ -1,8 +1,9 @@
 #pragma once
 
 // Defines a single record of the database
-struct Profile
+class Profile
 {
-	char* name[20];
+public:
+	char name[20];
 	int score;
 };
