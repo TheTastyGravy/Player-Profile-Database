@@ -92,12 +92,14 @@ int main()
             std::string name;
             std::cin >> name;
 
-
+            // Search the database for the user's name
             if (searchRecords(database, name, selectedRecord))
             {
-                // The record exists
+                print("Record found");
 
-                //display the record
+                // Display the record
+
+
             }
             else
                 print("Record does not exist");
@@ -155,10 +157,35 @@ int getInput()
 
 bool searchRecords(Profile* database, std::string name, Profile* ptrRef)
 {
-    //binary search
+    int lower = 0;
+    int upper = 100; //set to max used
 
+    // strcmp only accepts char arrays
+    const char* charName = name.c_str();
+
+    // Binary search
+    while (lower <= upper)
+    {
+        // Set to the center of the range
+        int mid = lower + (upper - lower) / 2;
+
+        // The names match
+        if (std::strcmp(database[mid].name, charName) == 0)
+        {
+            // Set ref to the correct record
+            ptrRef = &database[mid];
+            return true;
+        }
+        // To the right
+        else if (std::strcmp(database[mid].name, charName) < 0)
+            lower = mid + 1;
+        // To the left
+        else
+            upper = mid - 1;
+    }
     
-    return true;
+    // The record doesnt exist
+    return false;
 }
 
 bool isClosing()
