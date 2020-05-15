@@ -3,13 +3,46 @@
 
 FileHandler::FileHandler(std::string path)
 {
-	// Open the file in read mode first, in case it doesnt exist, as
-	// opening a file in write will prevent a file from being created
-	std::ofstream file;
-	file.open(path, std::ios::binary | std::ios::app);
-	file.close();
+	// Open the file in read mode so it doesnt create a new file
+	std::ifstream ifile;
+	ifile.open(path, std::ios::binary);
 
-	//if file does not exist, add some data to it. must be out of order so it can be sorted
+	// Check if the file doesnt exists
+	if (!ifile.is_open())
+	{
+		// Create a new file using write
+		std::ofstream ofile;
+		ofile.open(path, std::ios::binary);
+
+		// Fill the file with default data
+		{
+			Profile temp { "jack", 2450 };
+			ofile.write((char*)&temp, sizeof(Profile));
+		}
+		{
+			Profile temp { "bob", 1000 };
+			ofile.write((char*)&temp, sizeof(Profile));
+		}
+		{
+			Profile temp { "jill", 9989 };
+			ofile.write((char*)&temp, sizeof(Profile));
+		}
+		{
+			Profile temp { "amber", 4321 };
+			ofile.write((char*)&temp, sizeof(Profile));
+		}
+		{
+			Profile temp { "doug", 12345 };
+			ofile.write((char*)&temp, sizeof(Profile));
+		}
+		
+
+
+
+		ofile.close();
+	}
+
+	ifile.close();
 
 
 	this->path = path;
