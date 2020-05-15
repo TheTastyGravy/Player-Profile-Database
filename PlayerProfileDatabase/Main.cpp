@@ -5,8 +5,14 @@
 
 
 
+
+const int DATABASE_SIZE = 100;
+
+
 // Sorts 'database' in alphabetical order
 void sortDatabase(Profile* database);
+// Find the larges used index in 'database'
+int getDatabaseSize(Profile* database);
 
 
 // Get inputcommand from user and return a command code
@@ -14,7 +20,8 @@ int getInput();
 // Performs a binary search for a record of 'name' in 'database', and sets 'ptrRef' to it
 // Returns false if the record does not exist
 bool searchRecords(Profile* database, std::string name, Profile*& ptrRef);
-
+// Return a profile with user entered values
+Profile getUserProfile();
 // Check if the user wants to exit the program
 bool isClosing();
 
@@ -36,8 +43,8 @@ int main()
     // Used to access data file
     FileHandler file("data.bin");
 
-    // Dynamicaly allocate array. 100 should be large enough; change if nessesary
-    Profile* database = new Profile[100];
+    // Dynamicaly allocate array
+    Profile* database = new Profile[DATABASE_SIZE];
     // Load data into array, then sort it
     file.loadData(database);
     sortDatabase(database);
@@ -55,24 +62,6 @@ int main()
         // Set cursor position to the top and clear screen
         std::cout << CSI << "1;0H";
         clearLines(10);
-
-        
-        /*
-        Profile thing { "bob", 10 };
-
-        file.newRecord(&thing);
-
-
-        thing.score = 200;
-
-        file.newRecord(&thing);
-
-
-        for (int i = 0; i < 5; i++)
-        {
-            std::cout << database[i].name << " " << database[i].score << std::endl;
-        }
-        */
 
 
         // Get input, then execute it using the command code
@@ -106,27 +95,7 @@ int main()
             // There must be a selected record to edit
             if (selectedRecord != nullptr)
             {
-                // Get new values
-                std::string name;
-                int score;
-                std::cout << "Enter new name:" << INDENT;
-                std::cin >> name;
-                std::cout << "Enter new score:" << INDENT;
-                std::cin >> score;
-
-                // Invalid int; get new score
-                while (std::cin.fail())
-                {
-                    clearBuffer();
-                    std::cout << "Score must be an integer; try again:" << INDENT;
-                    std::cin >> score;
-                }
-
-
-                // Set the record's values
-                Profile newRecord;
-                strcpy_s(newRecord.name, name.c_str());
-                newRecord.score = score;
+                Profile newRecord = getUserProfile();
 
                 // Update the record in the file and database, then re-sort
                 file.updateRecord(selectedRecord, &newRecord);
@@ -140,10 +109,17 @@ int main()
         }
         else if (command == CREATE)
         {
-            //get input, then file.newRecord()
+            Profile newRecord = getUserProfile();
+
+            // Add record to file
+            file.newRecord(&newRecord);
+
+            // Put the record in an empty slot, then sort the database
+            int index = getDatabaseSize(database) + 1;
+            database[index] = newRecord;
+            sortDatabase(database);
         }
         
-
 
         // Exit if the user wants to
         exit = isClosing();
@@ -157,10 +133,23 @@ int main()
 
 
 
-
 void sortDatabase(Profile* database)
 {
 
+}
+
+int getDatabaseSize(Profile* database)
+{
+    // Iterate through the array until an empty element is found
+    for (int i = 0; i < DATABASE_SIZE; i++)
+    {
+        // The default value for score, therefore it is empty
+        if (database[i].score == -842150451)
+            return i;
+    }
+
+    // If it doesnt return, the array is full, so return max index
+    return DATABASE_SIZE - 1;
 }
 
 
@@ -187,8 +176,9 @@ int getInput()
 
 bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
 {
+    // The databases limits
     int lower = 0;
-    int upper = 100; //set to max used
+    int upper = getDatabaseSize(database);
 
     // strcmp only accepts char arrays
     char charName[20];
@@ -217,6 +207,33 @@ bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
     
     // The record doesnt exist
     return false;
+}
+
+Profile getUserProfile()
+{
+    // Get values
+    std::string name;
+    int score;
+    std::cout << "Enter name:" << INDENT;
+    std::cin >> name;
+    std::cout << "Enter score:" << INDENT;
+    std::cin >> score;
+
+    // Invalid int; get new score
+    while (std::cin.fail())
+    {
+        clearBuffer();
+        std::cout << "Score must be an integer; try again:" << INDENT;
+        std::cin >> score;
+    }
+
+
+    // Set the record's values
+    Profile newRecord;
+    strcpy_s(newRecord.name, name.c_str());
+    newRecord.score = score;
+
+    return newRecord;
 }
 
 bool isClosing()
