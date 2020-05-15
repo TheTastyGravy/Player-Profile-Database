@@ -21,9 +21,6 @@ bool isClosing();
 
 
 
-// Use this to change a profile's name
-//strcpy_s(thing.name, "hdg");
-
 int main()
 {
     // Setup terminal to use escape sequences
@@ -48,7 +45,7 @@ int main()
 
     // Set to true when the player wants to close
     bool exit = false;
-    // Holds the record in the array after searching
+    // Holds the record from the database after searching
     Profile* selectedRecord = nullptr;
 
 
@@ -98,16 +95,46 @@ int main()
                 print("Record found");
 
                 // Display the record
-                print("Name: " << (*selectedRecord).name);
-                print("Score: " << (*selectedRecord).score);
+                print(INDENT << "Name: " << (*selectedRecord).name);
+                print(INDENT << "Score: " << (*selectedRecord).score);
             }
             else
                 print("Record does not exist");
         }
         else if (command == EDIT)
         {
-            //only if selectedRecord != null
-            //get new record, then file.update()
+            // There must be a selected record to edit
+            if (selectedRecord != nullptr)
+            {
+                // Get new values
+                std::string name;
+                int score;
+                std::cout << "Enter new name:" << INDENT;
+                std::cin >> name;
+                std::cout << "Enter new score:" << INDENT;
+                std::cin >> score;
+
+                // Invalid int; get new score
+                while (std::cin.fail())
+                {
+                    clearBuffer();
+                    std::cout << "Score must be an integer; try again:" << INDENT;
+                    std::cin >> score;
+                }
+
+
+                // Set the record's values
+                Profile newRecord;
+                strcpy_s(newRecord.name, name.c_str());
+                newRecord.score = score;
+
+                // Update the record in the file and database, then resort
+                file.updateRecord(selectedRecord, &newRecord);
+                *selectedRecord = newRecord;
+                sortDatabase(database);
+            }
+            else
+                print("No record selected; select a record first");
         }
         else if (command == CREATE)
         {
@@ -122,6 +149,7 @@ int main()
     
 
     delete[] database;
+    //delete selectedRecord;
     return 0;
 }
 
@@ -161,7 +189,8 @@ bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
     int upper = 100; //set to max used
 
     // strcmp only accepts char arrays
-    const char* charName = name.c_str();
+    char charName[20];
+    strcpy_s(charName, name.c_str());
 
     // Binary search
     while (lower <= upper)
