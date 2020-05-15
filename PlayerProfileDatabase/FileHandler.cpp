@@ -45,29 +45,25 @@ void FileHandler::loadData(Profile* profiles)
 
 bool FileHandler::updateRecord(Profile* record, Profile* newRecord)
 {
-	// ios::app is used to prevent errasing data
 	std::fstream file;
-	file.open(path, std::ios::binary | std::ios::app);
-	// Reset put pos; ios::app sets it to the end
-	file.seekp(std::ios::beg);
+	file.open(path, std::ios::in | std::ios::out | std::ios::binary);
 
 	// Hold the current record
 	Profile temp;
 
-	// While not eof OR fail
+	// While not fail OR eof
 	while (!(file.fail() || file.eof())) 
 	{
 		// Read each record
 		file.read((char*)&temp, sizeof(Profile));
 
-		// Check name
-		if (temp.name == record->name) 
+		// Check if the names match
+		if (strcmp(temp.name, record->name) == 0) 
 		{
 			// Get the record's position
 			file.seekp(file.tellg() - (std::ios::streampos)sizeof(Profile));
 			// Replace the record
 			file.write((char*)newRecord, sizeof(Profile));
-
 
 			file.close();
 			// Record exists; return true

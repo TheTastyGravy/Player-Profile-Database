@@ -128,10 +128,12 @@ int main()
                 strcpy_s(newRecord.name, name.c_str());
                 newRecord.score = score;
 
-                // Update the record in the file and database, then resort
+                // Update the record in the file and database, then re-sort
                 file.updateRecord(selectedRecord, &newRecord);
                 *selectedRecord = newRecord;
                 sortDatabase(database);
+
+                print("Edit successful");
             }
             else
                 print("No record selected; select a record first");
