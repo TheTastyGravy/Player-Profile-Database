@@ -13,7 +13,7 @@ void sortDatabase(Profile* database);
 int getInput();
 // Performs a binary search for a record of 'name' in 'database', and sets 'ptrRef' to it
 // Returns false if the record does not exist
-bool searchRecords(Profile* database, std::string name, Profile* ptrRef);
+bool searchRecords(Profile* database, std::string name, Profile*& ptrRef);
 
 // Check if the user wants to exit the program
 bool isClosing();
@@ -98,8 +98,8 @@ int main()
                 print("Record found");
 
                 // Display the record
-
-
+                print("Name: " << (*selectedRecord).name);
+                print("Score: " << (*selectedRecord).score);
             }
             else
                 print("Record does not exist");
@@ -155,7 +155,7 @@ int getInput()
         return 0;
 }
 
-bool searchRecords(Profile* database, std::string name, Profile* ptrRef)
+bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
 {
     int lower = 0;
     int upper = 100; //set to max used
