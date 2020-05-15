@@ -9,6 +9,9 @@ FileHandler::FileHandler(std::string path)
 	file.open(path, std::ios::binary | std::ios::app);
 	file.close();
 
+	//if file does not exist, add some data to it. must be out of order so it can be sorted
+
+
 	this->path = path;
 }
 

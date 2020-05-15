@@ -1,61 +1,19 @@
 #include <iostream>
-#include <limits>
-#include <Windows.h>
+#include "GameDefines.h"
 #include "FileHandler.h"
 #include "Profile.h"
-// max is defined twice
-#undef max
-
-// Used for cleaner syntax
-#define print(x) std::cout << x << std::endl
 
 
 
-const char* CSI = "\x1b[";
-
-const char* INDENT = "\x1b[5C";
-
+// Sorts 'database' in alphabetical order
+void sortDatabase(Profile* database);
 
 
-
-// Set output mode to handle virtual terminal sequences
-bool enableVirtualTerminal()
-{
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE)
-        return false;
-
-    DWORD dwMode = 0;
-    if (!GetConsoleMode(hOut, &dwMode))
-        return false;
-
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    return (SetConsoleMode(hOut, dwMode));
-}
-// Clear the input buffer after each input
-void clearBuffer()
-{
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
-// Clear the current line, and n lines below it
-void clearLines(int n)
-{
-    // Clear the current line
-    std::cout << CSI << "2K";
-
-    // Go down clearing lines
-    for (int i = 0; i < n; i++)
-    {
-        std::cout << CSI << "B";
-        std::cout << CSI << "2K";
-    }
-    // Return to the starting line
-    std::cout << CSI << n << "A";
-}
-
-
-
+// Get inputcommand from user and return a command code
+int getInput();
+// Performs a binary search for a record of 'name' in 'database', and sets 'ptrRef' to it
+// Returns false if the record does not exist
+bool searchRecords(Profile* database, std::string name, Profile* ptrRef);
 
 // Check if the user wants to exit the program
 bool isClosing();
@@ -77,17 +35,21 @@ int main()
         return 1;
     }
 
+
     // Used to access data file
     FileHandler file("data.bin");
 
     // Dynamicaly allocate array. 100 should be large enough; change if nessesary
-    Profile* arr = new Profile[100];
-    // Load data into array
-    file.loadData(arr);
-    //---sort---
+    Profile* database = new Profile[100];
+    // Load data into array, then sort it
+    file.loadData(database);
+    sortDatabase(database);
+
 
     // Set to true when the player wants to close
     bool exit = false;
+    // Holds the record in the array after searching
+    Profile* selectedRecord = nullptr;
 
 
     // Game loop
@@ -96,7 +58,6 @@ int main()
         // Set cursor position to the top and clear screen
         std::cout << CSI << "1;0H";
         clearLines(10);
-
 
         
         /*
@@ -112,43 +73,93 @@ int main()
 
         for (int i = 0; i < 5; i++)
         {
-            std::cout << arr[i].name << " " << arr[i].score << std::endl;
+            std::cout << database[i].name << " " << database[i].score << std::endl;
         }
         */
 
 
+        // Get input, then execute it using the command code
+        int command = getInput();
 
-        // Prompt user, move cursor, and get input
-        std::cout << "Enter command:" << INDENT;
-        std::string val;
-        std::cin >> val;
-
-
-
-
-
-        //if search, go through array with binary
-
-        //if edit after search, get new record, then file.update()
-
-        //if new record, get input, then file.newRecord()
+        if (command == 0)
+        {
+            print("Invalid command");
+        }
+        else if (command == SEARCH)
+        {
+            // Get profile name from user
+            std::cout << "Enter name to search for:" << INDENT;
+            std::string name;
+            std::cin >> name;
 
 
+            if (searchRecords(database, name, selectedRecord))
+            {
+                // The record exists
 
+                //display the record
+            }
+            else
+                print("Record does not exist");
+        }
+        else if (command == EDIT)
+        {
+            //only if selectedRecord != null
+            //get new record, then file.update()
+        }
+        else if (command == CREATE)
+        {
+            //get input, then file.newRecord()
+        }
         
+
 
         // Exit if the user wants to
         exit = isClosing();
     }
     
 
-    delete[] arr;
+    delete[] database;
     return 0;
 }
 
 
 
 
+void sortDatabase(Profile* database)
+{
+
+}
+
+
+int getInput()
+{
+    // Clear input buffer to avoid false input
+    clearBuffer();
+
+    // Prompt user, move cursor, and get input
+    std::cout << "Enter command:" << INDENT;
+    std::string command;
+    std::cin >> command;
+
+    // Return correct command code
+    if (command == "search")
+        return SEARCH;
+    else if (command == "edit")
+        return EDIT;
+    else if (command == "create")
+        return CREATE;
+    else   // Unrecognised command
+        return 0;
+}
+
+bool searchRecords(Profile* database, std::string name, Profile* ptrRef)
+{
+    //binary search
+
+    
+    return true;
+}
 
 bool isClosing()
 {
