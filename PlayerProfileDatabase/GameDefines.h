@@ -15,8 +15,7 @@ const char* const INDENT = "\x1b[5C";
 const int SEARCH = 1;	// Search current records
 const int EDIT = 2;		// Edit the currently selected record
 const int CREATE = 3;	// Create new record
-
-
+const int DISPLAY = 4;	// Display the database
 
 
 

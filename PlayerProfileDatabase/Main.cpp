@@ -4,14 +4,12 @@
 #include "Profile.h"
 
 
-
-
 const int DATABASE_SIZE = 100;
 
 
 // Sorts 'database' in alphabetical order
 void sortDatabase(Profile* database);
-// Find the larges used index in 'database'
+// Find the largest used index in 'database'
 int getDatabaseSize(Profile* database);
 
 
@@ -24,8 +22,6 @@ bool searchRecords(Profile* database, std::string name, Profile*& ptrRef);
 Profile getUserProfile();
 // Check if the user wants to exit the program
 bool isClosing();
-
-
 
 
 int main()
@@ -119,6 +115,12 @@ int main()
             database[index] = newRecord;
             sortDatabase(database);
         }
+        else if (command == DISPLAY)
+        {
+            // Display all records
+            for (int i = 0; i < getDatabaseSize(database); i++)
+                print(i << ": " << database[i].name << ", " << database[i].score);
+        }
         
 
         // Exit if the user wants to
@@ -127,7 +129,6 @@ int main()
     
 
     delete[] database;
-    //delete selectedRecord;
     return 0;
 }
 
@@ -135,7 +136,26 @@ int main()
 
 void sortDatabase(Profile* database)
 {
+    int i, j;
+    Profile current;
 
+    // Go through every element
+    for (i = 1; i < getDatabaseSize(database); i++)
+    {
+        // Set the current element and index to sort from
+        current = database[i];
+        j = i - 1;
+
+        // Shift elements up to make space for the next element
+        while (j >= 0 && strcmp(database[j].name, current.name) > 0)
+        {
+            database[j + 1] = database[j];
+            j--;
+        }
+
+        // This will be either index 0, or the element below starts with a lower letter
+        database[j + 1] = current;
+    }
 }
 
 int getDatabaseSize(Profile* database)
@@ -170,6 +190,8 @@ int getInput()
         return EDIT;
     else if (command == "create")
         return CREATE;
+    else if (command == "display")
+        return DISPLAY;
     else   // Unrecognised command
         return 0;
 }
