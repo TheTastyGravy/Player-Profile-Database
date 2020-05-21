@@ -198,6 +198,11 @@ int getInput()
 
 bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
 {
+    // If thew name is too large, it cant exist
+    if (name.size > 20)
+        return false;
+    
+
     // The databases limits
     int lower = 0;
     int upper = getDatabaseSize(database);
@@ -233,14 +238,21 @@ bool searchRecords(Profile* database, std::string name, Profile*& ptrRef)
 
 Profile getUserProfile()
 {
-    // Get values
     std::string name;
     int score;
+
     std::cout << "Enter name:" << INDENT;
     std::cin >> name;
+    // If thew name is too large, it cant exist
+    while (name.size > 20)
+    {
+        clearBuffer();
+        std::cout << "Name must not be longer than 20 charecters; try again:" << INDENT;
+        std::cin >> name;
+    }
+
     std::cout << "Enter score:" << INDENT;
     std::cin >> score;
-
     // Invalid int; get new score
     while (std::cin.fail())
     {
