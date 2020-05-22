@@ -111,7 +111,7 @@ int main()
             file.newRecord(&newRecord);
 
             // Put the record in an empty slot, then sort the database
-            int index = getDatabaseSize(database) + 1;
+            int index = getDatabaseSize(database);
             database[index] = newRecord;
             sortDatabase(database);
         }
@@ -119,7 +119,7 @@ int main()
         {
             // Display all records
             for (int i = 0; i < getDatabaseSize(database); i++)
-                print(i << ": " << database[i].name << ", " << database[i].score);
+                print(i+1 << ": " << database[i].name << ", " << database[i].score);
         }
         
 
