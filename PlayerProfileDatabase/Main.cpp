@@ -57,8 +57,15 @@ int main()
     {
         // Set cursor position to the top and clear screen
         std::cout << CSI << "1;0H";
-        clearLines(10);
+        clearLines(30);
 
+
+        // Display the selected record
+        if (selectedRecord == nullptr)
+            print("No record selected");
+        else
+            print("Selected: " << selectedRecord->name);
+        
 
         // Get input, then execute it using the command code
         int command = getInput();
